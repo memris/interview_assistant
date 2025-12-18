@@ -34,3 +34,73 @@ td:first-child {
     color: #777;
     font-size: 0.9em;
 }
+
+button {
+    /* Убираем стандартные стили браузера */
+    border: 2px solid #4338CA; /* Задаем нашу обводку */
+    background-color: transparent; /* Прозрачный фон */
+    color: #4338CA; /* Цвет текста совпадает с цветом обводки */
+    
+    /* Размеры и отступы */
+    padding: 10px 15px;
+    font-size: 1em;
+    font-weight: bold;
+    
+    /* Закругление углов */
+    border-radius: 8px;
+    
+    /* Плавный переход для эффекта при наведении */
+    transition: background-color 0.3s, color 0.3s;
+    
+    /* Меняем курсор, чтобы показать, что элемент кликабельный */
+    cursor: pointer;
+    
+    /* Небольшой отступ между кнопками, если они стоят рядом */
+    margin: 5px;
+}
+
+/* Эффект при наведении курсора на ЛЮБУЮ кнопку */
+button:hover {
+    background-color: #4338CA; /* Фон становится нужного цвета */
+    color: white; /* Текст становится белым */
+}
+
+/* --- Дополнительная стилизация для разных типов кнопок (опционально) --- */
+
+/* Стиль для главной кнопки в форме (Добавить / Сохранить) */
+form button[type="submit"] {
+    background-color: #4338CA; /* Изначально делаем ее залитой */
+    color: white;
+    margin-top: 10px; /* Небольшой отступ сверху */
+}
+
+/* Эффект при наведении для главной кнопки (чтобы она не менялась) */
+form button[type="submit"]:hover {
+    /* Можно сделать ее чуть светлее или темнее при наведении для эффекта */
+    background-color: #31289c;
+    border-color: #31289c;
+}
+
+/* Стиль для кнопок "Удалить", чтобы они были менее навязчивыми */
+button.delete-btn {
+    border-color: #E57373;
+    color: #E57373;
+}
+
+button.delete-btn:hover {
+    background-color: #E57373;
+    color: white;
+}
+
+a {
+    color: #4338CA;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #4338CA;
+}
