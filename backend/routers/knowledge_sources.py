@@ -25,3 +25,23 @@ def read_knowledge_source(source_id: int, db: Session = Depends(get_db)):
     if db_source is None:
         raise HTTPException(status_code=404, detail="Knowledge source not found")
     return db_source
+
+
+@router.put("/{source_id}", response_model=schemas.KnowledgeSource, summary="Обновить источник по ID")
+def update_knowledge_source(source_id: int, source: schemas.KnowledgeSourceCreate, db: Session = Depends(get_db)):
+    db_source = crud.get_knowledge_source(db, source_id=source_id)
+    if db_source is None:
+        raise HTTPException(status_code=404, detail="Source not found")
+    
+    # Здесь нужна CRUD-функция для обновления, которая также обновит теги
+    updated_source = crud.update_knowledge_source(db=db, source_id=source_id, source_update=source)
+    return updated_source
+
+
+# --- НОВЫЙ ЭНДПОИНТ ДЛЯ УДАЛЕНИЯ (DELETE) ---
+@router.delete("/{source_id}", status_code=204, summary="Удалить источник по ID")
+def delete_knowledge_source(source_id: int, db: Session = Depends(get_db)):
+    db_source = crud.delete_knowledge_source(db, source_id=source_id)
+    if db_source is None:
+        raise HTTPException(status_code=404, detail="Source not found")
+    return

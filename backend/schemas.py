@@ -45,10 +45,11 @@ class KnowledgeSourceCreate(KnowledgeSourceBase):
 class KnowledgeSource(KnowledgeSourceBase):
     id: int
     added_date: datetime
-    tags: List[Tag] = [] 
+    topic: Topic # <-- Возвращаем полный объект Topic
+    tags: List[Tag] = [] # <-- Возвращаем список полных объектов Tag
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Схемы для Users ---
 

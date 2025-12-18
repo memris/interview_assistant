@@ -64,9 +64,6 @@ def delete_tag(db: Session, tag_id: int):
         db.commit()
     return db_tag 
 
-# backend/crud.py
-# ...
-
 def update_tag(db: Session, tag_id: int, tag: schemas.TagCreate):
     db_tag = db.query(models.Tag).filter(models.Tag.id == tag_id).first()
     if db_tag:
@@ -91,11 +88,37 @@ def create_knowledge_source(db: Session, source: schemas.KnowledgeSourceCreate):
         topic_id=source.topic_id
     )
     
-    # Находим в БД объекты тегов по их ID из запроса
     tags = db.query(models.Tag).filter(models.Tag.id.in_(source.tags)).all()
     db_source.tags = tags
     
     db.add(db_source)
+    db.commit()
+    db.refresh(db_source)
+    return db_source
+
+def delete_knowledge_source(db: Session, source_id: int):
+    db_source = db.query(models.KnowledgeSource).filter(models.KnowledgeSource.id == source_id).first()
+    if db_source:
+        db.delete(db_source)
+        db.commit()
+    return db_source
+
+def update_knowledge_source(db: Session, source_id: int, source_update: schemas.KnowledgeSourceCreate):
+    db_source = db.query(models.KnowledgeSource).filter(models.KnowledgeSource.id == source_id).first()
+    if not db_source:
+        return None
+
+    # Обновляем простые поля
+    db_source.title = source_update.title
+    db_source.source_url = source_update.source_url
+    db_source.content = source_update.content
+    db_source.topic_id = source_update.topic_id
+    
+    # Обновляем теги
+    if source_update.tags is not None:
+        tags = db.query(models.Tag).filter(models.Tag.id.in_(source_update.tags)).all()
+        db_source.tags = tags
+
     db.commit()
     db.refresh(db_source)
     return db_source
