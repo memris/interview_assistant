@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 
 from .config import settings
 
-# --- Настройка подключения к базе данных ---
 
 SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
@@ -16,7 +15,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-# --- Функция-зависимость для получения сессии БД ---
 
 def get_db():
     """

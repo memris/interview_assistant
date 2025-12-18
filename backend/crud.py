@@ -57,6 +57,24 @@ def create_tag(db: Session, tag: schemas.TagCreate):
     db.refresh(db_tag)
     return db_tag
 
+def delete_tag(db: Session, tag_id: int):
+    db_tag = db.query(models.Tag).filter(models.Tag.id == tag_id).first()
+    if db_tag:
+        db.delete(db_tag)
+        db.commit()
+    return db_tag 
+
+# backend/crud.py
+# ...
+
+def update_tag(db: Session, tag_id: int, tag: schemas.TagCreate):
+    db_tag = db.query(models.Tag).filter(models.Tag.id == tag_id).first()
+    if db_tag:
+        db_tag.tag_name = tag.tag_name
+        db.commit()
+        db.refresh(db_tag)
+    return db_tag
+
 # --- CRUD для Knowledge Sources ---
 
 def get_knowledge_source(db: Session, source_id: int):

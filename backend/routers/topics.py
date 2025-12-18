@@ -33,3 +33,30 @@ def read_topic(topic_id: int, db: Session = Depends(get_db)):
     if db_topic is None:
         raise HTTPException(status_code=404, detail="Topic not found")
     return db_topic
+
+
+@router.put("/{topic_id}", response_model=schemas.Topic, summary="Обновить тему по ID")
+def update_topic(topic_id: int, topic_update: schemas.TopicCreate, db: Session = Depends(get_db)):
+    db_topic = crud.get_topic(db, topic_id=topic_id)
+    if db_topic is None:
+        raise HTTPException(status_code=404, detail="Topic not found")
+    
+    update_data = topic_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_topic, key, value)
+        
+    db.add(db_topic)
+    db.commit()
+    db.refresh(db_topic)
+    return db_topic
+
+
+@router.delete("/{topic_id}", status_code=204, summary="Удалить тему по ID")
+def delete_topic(topic_id: int, db: Session = Depends(get_db)):
+    db_topic = crud.get_topic(db, topic_id=topic_id)
+    if db_topic is None:
+        raise HTTPException(status_code=404, detail="Topic not found")
+        
+    db.delete(db_topic)
+    db.commit()
+    return
