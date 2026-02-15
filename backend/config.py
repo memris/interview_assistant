@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field 
+from typing import Optional
 
 class Settings(BaseSettings):
     """
@@ -17,6 +18,14 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str = Field(..., env='POSTGRES_SERVER')
     POSTGRES_PORT: int = Field(..., env='POSTGRES_PORT')
     POSTGRES_DB: str = Field(..., env='POSTGRES_DB')
+
+    # llm
+    GIGACHAT_CREDENTIALS: Optional[str] = None 
+
+    # rag
+    VECTOR_DB_DIR: str = "vector_db_data" # папка, где chromadb будет хранить свои файлы
+    CHUNK_SIZE: int = 1000                # размер кусочка текста (в символах)
+    CHUNK_OVERLAP: int = 100              # нахлест между кусочками (чтобы не терять контекст)
     
     @property
     def DATABASE_URL(self) -> str:

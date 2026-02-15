@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
 
+from backend.models import SourceStatus
+
 # --- Схемы для Tags ---
 
 class TagBase(BaseModel):
@@ -14,7 +16,7 @@ class Tag(TagBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Схемы для Topics ---
 
@@ -29,27 +31,28 @@ class Topic(TopicBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Схемы для Knowledge Sources ---
-
 class KnowledgeSourceBase(BaseModel):
     title: str
-    source_url: Optional[str] = None
-    content: str
     topic_id: int
+    source_url: Optional[str] = None
 
 class KnowledgeSourceCreate(KnowledgeSourceBase):
     tags: List[int] = []
 
 class KnowledgeSource(KnowledgeSourceBase):
     id: int
-    added_date: datetime
-    topic: Topic # <-- Возвращаем полный объект Topic
-    tags: List[Tag] = [] # <-- Возвращаем список полных объектов Tag
+    content: str
+    status: SourceStatus 
+    created_at: datetime
+    topic: Topic 
+    tags: List[Tag] = [] 
 
     class Config:
-        from_attributes = True
+        from_attributes = True 
+
 
 # --- Схемы для Users ---
 
@@ -65,7 +68,7 @@ class User(UserBase):
     registration_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Схемы для Session QnA (Вопросы-Ответы) ---
 
@@ -85,7 +88,7 @@ class SessionQnA(SessionQnABase):
     timestamp: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Схемы для Interview Sessions ---
 
@@ -108,4 +111,4 @@ class InterviewSession(InterviewSessionBase):
     questions: List[SessionQnA] = [] 
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -1,10 +1,11 @@
 from sqlalchemy import (
-    create_engine, Column, Integer, String, Text, 
-    TIMESTAMP, Float, ForeignKey, UniqueConstraint
+    DateTime, create_engine, Column, Integer, String, Text, 
+    TIMESTAMP, Float, ForeignKey, UniqueConstraint, Enum
 )
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
+import enum
 
 Base = declarative_base()
 
@@ -48,6 +49,11 @@ class SourceTag(Base):
     source_id = Column(Integer, ForeignKey('knowledge_sources.id', ondelete="CASCADE"), primary_key=True)
     tag_id = Column(Integer, ForeignKey('tags.id', ondelete="CASCADE"), primary_key=True)
 
+class SourceStatus(enum.Enum):
+    PENDING = "pending"       # файл загружен, ждет очереди на обработку
+    PROCESSING = "processing" # идет разбиение на чанки и создание эмбеддингов
+    COMPLETED = "completed"   # успешно проиндексировано, можно использовать
+    FAILED = "failed"    
 # --- Основные таблицы ---
 
 class KnowledgeSource(Base):
@@ -57,7 +63,9 @@ class KnowledgeSource(Base):
     title = Column(String(255), nullable=False)
     source_url = Column(String(255), nullable=True)
     content = Column(Text, nullable=False)
-    added_date = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    status = Column(Enum(SourceStatus), default=SourceStatus.PENDING, nullable=False)
     
     topic_id = Column(Integer, ForeignKey('topics.id', ondelete="RESTRICT"), nullable=False)
 

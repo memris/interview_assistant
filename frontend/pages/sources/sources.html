@@ -21,6 +21,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Название</th>
+                    <th>Статус</th>
                     <th>URL</th>
                     <th>Тема</th>
                     <th>Теги</th>
@@ -28,7 +29,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Данные будут вставлены сюда с помощью JavaScript -->
+                <!-- данные будут вставлены сюда с помощью js -->
             </tbody>
         </table>
 
@@ -36,31 +37,31 @@
 
         <h2>Добавить новый источник</h2>
         <form id="add-source-form">
-            <input type="hidden" id="source-id">
+    <input type="hidden" id="source-id">
 
-            <label for="source-title">Название:</label>
-            <input type="text" id="source-title" required>
-            
-            <label for="source-url">URL:</label>
-            <input type="url" id="source-url">
+    <label for="source-title">Название:</label>
+    <input type="text" id="source-title" required>
 
-            <label for="source-topic">Тема:</label>
-            <select id="source-topic" required>
-                <!-- Опции для тем будут загружены сюда -->
-                <option value="">Загрузка...</option>
-            </select>
+    
+    <label for="source-url">URL (необязательно):</label>
+    <input type="url" id="source-url">
 
-            <label>Теги:</label>
-            <div id="source-tags-container">
-                <!-- Чекбоксы для тегов будут загружены сюда -->
-                Загрузка...
-            </div>
+    <label for="source-file">Файл источника (PDF или TXT):</label>
+    <input type="file" id="source-file" name="file" accept=".pdf,.txt">
 
-            <label for="source-content">Контент:</label>
-            <textarea id="source-content" rows="10" required></textarea>
-            
-            <button type="submit">Добавить</button>
-        </form>
+    <label for="source-topic">Тема:</label>
+    <select id="source-topic" required>
+        <option value="">Загрузка...</option>
+    </select>
+
+    <label>Теги:</label>
+    <div id="source-tags-container">Загрузка...</div>
+
+    <label for="source-content">Контент (извлечется из файла):</label>
+    <textarea id="source-content" rows="3" readonly></textarea>
+    
+    <button type="submit">Добавить</button>
+</form>
     </main>
 
     <script src="sources.js"></script>

@@ -52,21 +52,32 @@ async function fetchAndDisplaySources() {
         const tableBody = document.querySelector('#sources-table tbody');
         tableBody.innerHTML = '';
 
+        const statusMap = {
+            'pending': '⏳ Ожидает',
+            'processing': '⚙️ Обработка',
+            'completed': '✅ Готов',
+            'failed': '❌ Ошибка'
+        };
+
         sources.forEach(source => {
             const row = document.createElement('tr');
             const tagsString = source.tags.map(tag => tag.tag_name).join(', ');
+            
+            // statusText вычисляем внутри цикла для каждого source
+            const statusText = statusMap[source.status] || source.status;
 
             row.dataset.source = JSON.stringify(source);
 
             row.innerHTML = `
                 <td>${source.id}</td>
                 <td>${source.title}</td>
+                <td>${statusText}</td> 
                 <td><a href="${source.source_url || '#'}" target="_blank">Ссылка</a></td>
                 <td>${source.topic ? source.topic.topic_name : 'N/A'}</td>
                 <td>${tagsString}</td>
                 <td>
-                    <button class="edit-btn" data-id="${source.id}">✏️ Изменить</button>
-                    <button class="delete-btn" data-id="${source.id}">🗑️ Удалить</button>
+                    <button class="edit-btn" data-id="${source.id}">✏️</button>
+                    <button class="delete-btn" data-id="${source.id}">🗑️</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -80,54 +91,68 @@ async function fetchAndDisplaySources() {
 async function handleFormSubmit(event) {
     event.preventDefault();
 
-    const sourceId = sourceIdInput.value; // Получаем ID из скрытого поля
-    const isEditing = !!sourceId; // Если ID есть, значит, это режим редактирования
+    const sourceId = sourceIdInput.value;
+    const isEditing = !!sourceId;
 
     const title = document.getElementById('source-title').value;
-    const url = document.getElementById('source-url').value;
-    const content = document.getElementById('source-content').value;
     const topicId = document.getElementById('source-topic').value;
-    const selectedTags = Array.from(document.querySelectorAll('#source-tags-container input:checked')).map(cb => parseInt(cb.value));
+    const fileInput = document.getElementById('source-file'); 
+    
+    const selectedTags = Array.from(document.querySelectorAll('#source-tags-container input:checked'))
+                              .map(cb => cb.value);
 
     if (!topicId) {
         alert("Пожалуйста, выберите тему.");
         return;
     }
 
-    const sourceData = {
-        title: title,
-        source_url: url,
-        content: content,
-        topic_id: parseInt(topicId),
-        tags: selectedTags
-    };
+    // исп FormData вместо обычного объекта
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('topic_id', topicId);
+    
+    // если созд новый источник, файл обязателен
+    if (!isEditing) {
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        } else {
+            alert("Пожалуйста, выберите файл.");
+            return;
+        }
+    }
+
+    selectedTags.forEach(tagId => {
+        formData.append('tags', tagId);
+    });
 
     const urlEndpoint = isEditing ? `/api/knowledge_sources/${sourceId}` : '/api/knowledge_sources/';
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
+        console.log("Отправка данных...");
+
         const response = await fetch(urlEndpoint, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sourceData),
+            // headers с content-type удаляем совсем, 
+            // браузер сам поймет, что это FormData и поставит нужный boundary
+            body: formData, 
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(`Ошибка: ${errorData.detail}`);
+            console.error('Ошибка сервера:', errorData);
+            throw new Error(`Ошибка: ${JSON.stringify(errorData.detail)}`);
         }
 
+        alert(isEditing ? "Обновлено" : "Источник добавлен и отправляется на индексацию");
         resetForm();
         await fetchAndDisplaySources();
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('Ошибка в handleFormSubmit:', error);
         alert(error.message);
     }
 }
 
-/**
- * Обрабатывает удаление источника.
- */
 async function handleDelete(sourceId) {
     if (!confirm(`Вы уверены, что хотите удалить источник с ID ${sourceId}?`)) return;
 
@@ -140,25 +165,21 @@ async function handleDelete(sourceId) {
     }
 }
 
-/**
- * Заполняет форму данными для редактирования.
- */
 function populateFormForEdit(sourceId) {
-    // Находим строку таблицы с нужным ID
     const row = document.querySelector(`button[data-id='${sourceId}']`).closest('tr');
-    // Получаем полный объект source из data-атрибута
     const source = JSON.parse(row.dataset.source);
-
-    // Заполняем все поля формы
+    
     sourceIdInput.value = source.id;
     document.getElementById('source-title').value = source.title;
     document.getElementById('source-url').value = source.source_url || '';
-    document.getElementById('source-content').value = source.content;
+    
+    // поле контента у нас теперь readonly и берется из файла, 
+    // при редактировании мы обычно меняем только название/теги
+    document.getElementById('source-content').value = "Контент загруженного файла (редактирование недоступно)";
     document.getElementById('source-topic').value = source.topic.id;
 
-    // Сбрасываем все чекбоксы тегов
+    // сброс и установка чекбоксов
     document.querySelectorAll('#source-tags-container input').forEach(cb => cb.checked = false);
-    // Отмечаем те, которые есть у источника
     const sourceTagIds = source.tags.map(tag => tag.id);
     document.querySelectorAll('#source-tags-container input').forEach(cb => {
         if (sourceTagIds.includes(parseInt(cb.value))) {
@@ -166,22 +187,18 @@ function populateFormForEdit(sourceId) {
         }
     });
 
-    // Меняем текст кнопки и прокручиваем к форме
     submitButton.textContent = 'Сохранить изменения';
     form.scrollIntoView({ behavior: 'smooth' });
 }
 
-/**
- * Сбрасывает форму в исходное состояние (для создания).
- */
 function resetForm() {
     form.reset();
     sourceIdInput.value = '';
     submitButton.textContent = 'Добавить';
+
+    const fileInput = document.getElementById('source-file');
+    if (fileInput) fileInput.value = ""; 
 }
-
-
-// --- "Слушатели" событий ---
 
 document.addEventListener('DOMContentLoaded', initializePage);
 form.addEventListener('submit', handleFormSubmit);
