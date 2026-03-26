@@ -4,8 +4,6 @@ from typing import List, Optional
 
 from backend.models import SourceStatus
 
-# --- Схемы для Tags ---
-
 class TagBase(BaseModel):
     tag_name: str
 
@@ -18,7 +16,6 @@ class Tag(TagBase):
     class Config:
         from_attributes = True
 
-# --- Схемы для Topics ---
 
 class TopicBase(BaseModel):
     topic_name: str
@@ -33,7 +30,6 @@ class Topic(TopicBase):
     class Config:
         from_attributes = True
 
-# --- Схемы для Knowledge Sources ---
 class KnowledgeSourceBase(BaseModel):
     title: str
     topic_id: int
@@ -54,14 +50,14 @@ class KnowledgeSource(KnowledgeSourceBase):
         from_attributes = True 
 
 
-# --- Схемы для Users ---
-
 class UserBase(BaseModel):
     username: str
     email: str
+    role: str
 
 class UserCreate(UserBase):
     password: str
+    role: str
 
 class User(UserBase):
     id: int
@@ -70,7 +66,6 @@ class User(UserBase):
     class Config:
         from_attributes = True
 
-# --- Схемы для Session QnA (Вопросы-Ответы) ---
 
 class SessionQnABase(BaseModel):
     question_text: str
@@ -89,8 +84,6 @@ class SessionQnA(SessionQnABase):
 
     class Config:
         from_attributes = True
-
-# --- Схемы для Interview Sessions ---
 
 class InterviewSessionBase(BaseModel):
     user_id: int

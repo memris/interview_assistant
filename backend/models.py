@@ -1,6 +1,6 @@
 from sqlalchemy import (
     DateTime, create_engine, Column, Integer, String, Text, 
-    TIMESTAMP, Float, ForeignKey, UniqueConstraint, Enum
+    TIMESTAMP, Float, ForeignKey, UniqueConstraint, Enum, Table
 )
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,7 +9,9 @@ import enum
 
 Base = declarative_base()
 
-# --- Таблицы-справочники ---
+class UserRole(enum.Enum):
+    CANDIDATE = "candidate"
+    INTERVIEWER = "interviewer"
 
 class User(Base):
     __tablename__ = 'users'
@@ -19,6 +21,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     registration_date = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    role = Column(Enum(UserRole), default=UserRole.CANDIDATE, nullable=False)
 
     sessions = relationship("InterviewSession", back_populates="user")
 
@@ -33,28 +36,27 @@ class Topic(Base):
     knowledge_sources = relationship("KnowledgeSource", back_populates="topic")
     sessions = relationship("InterviewSession", back_populates="topic")
 
+source_tags = Table(
+    'source_tags',
+    Base.metadata,
+    Column('source_id', Integer, ForeignKey('knowledge_sources.id', ondelete="CASCADE"), primary_key=True),
+    Column('tag_id', Integer, ForeignKey('tags.id', ondelete="CASCADE"), primary_key=True)
+)
 class Tag(Base):
     __tablename__ = 'tags'
 
     id = Column(Integer, primary_key=True, index=True)
     tag_name = Column(String(255), unique=True, nullable=False, index=True)
 
-    knowledge_sources = relationship("KnowledgeSource", secondary="source_tags", back_populates="tags")
+    knowledge_sources = relationship("KnowledgeSource", secondary=source_tags, back_populates="tags")
 
-# --- Связующая таблица (Многие-ко-многим) ---
-
-class SourceTag(Base):
-    __tablename__ = 'source_tags'
-
-    source_id = Column(Integer, ForeignKey('knowledge_sources.id', ondelete="CASCADE"), primary_key=True)
-    tag_id = Column(Integer, ForeignKey('tags.id', ondelete="CASCADE"), primary_key=True)
-
+# Связующая таблица (Многие-ко-многим)
 class SourceStatus(enum.Enum):
     PENDING = "pending"       # файл загружен, ждет очереди на обработку
     PROCESSING = "processing" # идет разбиение на чанки и создание эмбеддингов
     COMPLETED = "completed"   # успешно проиндексировано, можно использовать
     FAILED = "failed"    
-# --- Основные таблицы ---
+
 
 class KnowledgeSource(Base):
     __tablename__ = 'knowledge_sources'
@@ -73,7 +75,7 @@ class KnowledgeSource(Base):
     # Один источник принадлежит одной теме
     topic = relationship("Topic", back_populates="knowledge_sources")
     # Один источник может иметь много тегов (через связующую таблицу)
-    tags = relationship("Tag", secondary="source_tags", back_populates="knowledge_sources")
+    tags = relationship("Tag", secondary=source_tags, back_populates="knowledge_sources")
 
 class InterviewSession(Base):
     __tablename__ = 'interview_sessions'

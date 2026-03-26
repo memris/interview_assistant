@@ -3,11 +3,24 @@ from fastapi.staticfiles import StaticFiles
 from .config import settings
 from .routers import topics, users, tags, knowledge_sources, interview_sessions
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
+from .database import engine, Base
+from . import models 
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.PROJECT_VERSION
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(topics.router, prefix="/api")
