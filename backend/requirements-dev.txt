@@ -1,0 +1,7 @@
+pytest
+requests
+sqlalchemy
+fastapi
+pydantic
+pydantic-settings
+python-dotenv

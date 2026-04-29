@@ -32,7 +32,7 @@ app.include_router(interview_sessions.router, prefix="/api")
 
 current_file_path = os.path.dirname(os.path.realpath(__file__))
 
-frontend_path = os.path.join(current_file_path, "..", "frontend")
+frontend_path = os.path.join(current_file_path, "..", "frontend", "interview-assistant")
 
 app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
 

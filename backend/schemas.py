@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import List, Optional
 
 from backend.models import SourceStatus
+from . import models
 
 class TagBase(BaseModel):
     tag_name: str
@@ -34,6 +35,7 @@ class KnowledgeSourceBase(BaseModel):
     title: str
     topic_id: int
     source_url: Optional[str] = None
+    content: str
 
 class KnowledgeSourceCreate(KnowledgeSourceBase):
     tags: List[int] = []
@@ -65,6 +67,16 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    role: models.UserRole = models.UserRole.CANDIDATE
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class SessionQnABase(BaseModel):

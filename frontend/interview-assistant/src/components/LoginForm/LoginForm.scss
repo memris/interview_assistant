@@ -2,6 +2,7 @@ $primary-color: #4338CA;
 $text-dark: #1e293b;
 $text-gray: #64748b;
 $bg-light: #f8fafc;
+@use "sass:color";
 
 .login-form-card {
   background: white;
@@ -114,7 +115,7 @@ $bg-light: #f8fafc;
     transition: background 0.2s;
 
     &:hover {
-      background-color: darken($primary-color, 5%);
+      background-color: color.adjust($primary-color, $lightness: -5%);
     }
   }
 

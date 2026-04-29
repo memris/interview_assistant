@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, ShieldCheck, X } from 'lucide-react';
+import axios, { AxiosError } from 'axios';
 import './LoginForm.scss';
 
 interface LoginFormProps {
@@ -10,11 +11,46 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   const [role, setRole] = useState<'candidate' | 'interviewer'>('candidate');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+// <HTMLFormElement>, чтобы уточнить, что это событие формы
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Данные входа:", { email, password, role });
-    // TODO: реализовать вызов API бэкенда
+    setError('');
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
+        email: email,
+        password: password
+      });
+
+      const { access_token, role: userRole, username } = response.data;
+      
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('role', userRole);
+      localStorage.setItem('username', username);
+
+      alert(`Успешный вход! Добро пожаловать, ${username}`);
+      
+      if (onClose) onClose();
+      
+      if (userRole === 'interviewer') {
+        window.location.href = '/sources';
+      } else {
+        window.location.href = '/topics';
+      }
+
+    } catch (err) {
+      // вместо (err: any) исп приведение к типу AxiosError
+      const axiosError = err as AxiosError<{ detail: string }>;
+      
+      if (axiosError.response && axiosError.response.status === 401) {
+        setError('Неверный email или пароль');
+      } else {
+        setError('Ошибка сервера. Попробуйте позже.');
+      }
+      console.error("Login error:", axiosError);
+    }
   };
 
   return (
@@ -27,6 +63,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
       
       <h2>Вход в систему</h2>
       <p className="subtitle">Выберите вашу роль и введите данные</p>
+
+      {/* вывод ошибки */}
+      {error && <div style={{ color: 'red', marginBottom: '10px', textAlign: 'center' }}>{error}</div>}
 
       <div className="role-selector">
         <button 
