@@ -1,6 +1,6 @@
 # Interview Assistant
 
-> An AI-powered full-stack application for conducting technical interviews, evaluating candidate answers, and helping candidates prepare — powered by **GigaChat API** and a **local embeddings model**.
+> An AI-powered full-stack application for conducting technical interviews, evaluating candidate answers, and helping candidates prepare — powered by **GigaChat API** and a **local embeddings model** (sentence-transformers/all-MiniLM-L6-v2 from HuggingFace).
 
 ---
 
