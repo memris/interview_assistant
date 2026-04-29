@@ -142,6 +142,6 @@ This project is open source. See [LICENSE](LICENSE) for details.
 
 ## Acknowledgements
 
-- [GigaChat](https://developers.sber.ru/portal/products/gigachat) — LLM by Sberbank
+- [GigaChat](https://giga.chat) — LLM by Sberbank
 - [FastAPI](https://fastapi.tiangolo.com/) — Modern Python web framework
 - [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) — Frontend stack
