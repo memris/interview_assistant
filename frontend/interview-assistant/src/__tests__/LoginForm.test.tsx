@@ -49,4 +49,30 @@ describe('LoginForm component', () => {
       expect(screen.getByText(/Неверный email или пароль/i)).toBeInTheDocument();
     });
   });
+
+  it('shows error when server error', async () => {
+    mockedAxios.post.mockRejectedValue({ response: { status: 500 } });
+
+    render(<LoginForm />);
+
+    fireEvent.change(screen.getByPlaceholderText(/mail@example.com/i), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'password' } });
+    fireEvent.click(screen.getByRole('button', { name: /Войти как Кандидат/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Ошибка сервера/i)).toBeInTheDocument();
+    });
+  });
+
+  it('closes modal on close button click', () => {
+    const mockOnClose = vi.fn();
+    render(<LoginForm onClose={mockOnClose} />);
+    fireEvent.click(screen.getByRole('button', { name: '' })); // close button has no name
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it('renders registration link', () => {
+    render(<LoginForm />);
+    expect(screen.getByText(/Зарегистрироваться/i)).toBeInTheDocument();
+  });
 });
