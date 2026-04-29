@@ -111,7 +111,7 @@ EMBEDDINGS_MODEL_PATH=./models/embeddings   # path to local embeddings model
 
 ---
 
-## 🔌 API Overview
+## API Overview
 
 | Method | Endpoint                  | Description                        |
 |--------|---------------------------|------------------------------------|
