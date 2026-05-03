@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import TopicsPage from './pages/TopicsPage';
 import SourcesPage from './pages/SourcesPage';
 import LandingPage from './pages/LandingPage/LandingPage';
+import DashboardPage from './pages/DashboardPage/DashboardPage';
+import InterviewPage from './pages/InterviewPage/InterviewPage';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
         
         {/* Заглушка для интервью */}
         <Route path="/interview" element={<div style={{padding: '20px'}}>Страница интервью в разработке</div>} />
+      <Route path="/topics" element={<DashboardPage />} /> 
+      <Route path="/interview/:sessionId" element={<InterviewPage />} />
       </Routes>
     </Router>
   );

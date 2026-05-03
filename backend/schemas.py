@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from typing import List, Optional
 
@@ -14,8 +14,7 @@ class TagCreate(TagBase):
 class Tag(TagBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TopicBase(BaseModel):
@@ -28,8 +27,7 @@ class TopicCreate(TopicBase):
 class Topic(TopicBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class KnowledgeSourceBase(BaseModel):
     title: str
@@ -48,8 +46,7 @@ class KnowledgeSource(KnowledgeSourceBase):
     topic: Topic 
     tags: List[Tag] = [] 
 
-    class Config:
-        from_attributes = True 
+    model_config = ConfigDict(from_attributes=True) 
 
 
 class UserBase(BaseModel):
@@ -65,8 +62,7 @@ class User(UserBase):
     id: int
     registration_date: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UserCreate(BaseModel):
     username: str
@@ -94,8 +90,7 @@ class SessionQnA(SessionQnABase):
     session_id: int
     timestamp: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class InterviewSessionBase(BaseModel):
     user_id: int
@@ -115,5 +110,4 @@ class InterviewSession(InterviewSessionBase):
     overall_score: Optional[float] = None
     questions: List[SessionQnA] = [] 
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

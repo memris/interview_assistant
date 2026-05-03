@@ -2,8 +2,7 @@ from sqlalchemy import (
     DateTime, create_engine, Column, Integer, String, Text, 
     TIMESTAMP, Float, ForeignKey, UniqueConstraint, Enum, Table
 )
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 from sqlalchemy.sql import func
 import enum
 

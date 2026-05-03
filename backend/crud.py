@@ -36,7 +36,7 @@ def get_topics(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Topic).offset(skip).limit(limit).all()
 
 def create_topic(db: Session, topic: schemas.TopicCreate):
-    db_topic = models.Topic(**topic.dict())
+    db_topic = models.Topic(**topic.model_dump())
     db.add(db_topic)
     db.commit()
     db.refresh(db_topic)
@@ -51,7 +51,7 @@ def get_tags(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Tag).offset(skip).limit(limit).all()
 
 def create_tag(db: Session, tag: schemas.TagCreate):
-    db_tag = models.Tag(**tag.dict())
+    db_tag = models.Tag(**tag.model_dump())
     db.add(db_tag)
     db.commit()
     db.refresh(db_tag)
@@ -126,7 +126,7 @@ def update_knowledge_source(db: Session, source_id: int, source_update: schemas.
 # --- CRUD для Interview Sessions ---
 
 def create_interview_session(db: Session, session: schemas.InterviewSessionCreate):
-    db_session = models.InterviewSession(**session.dict())
+    db_session = models.InterviewSession(**session.model_dump())
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
@@ -138,7 +138,7 @@ def get_interview_sessions_by_user(db: Session, user_id: int, skip: int = 0, lim
 # --- CRUD для Session QnA ---
 
 def create_session_qna(db: Session, qna: schemas.SessionQnACreate, session_id: int):
-    db_qna = models.SessionQnA(**qna.dict(), session_id=session_id)
+    db_qna = models.SessionQnA(**qna.model_dump(), session_id=session_id)
     db.add(db_qna)
     db.commit()
     db.refresh(db_qna)

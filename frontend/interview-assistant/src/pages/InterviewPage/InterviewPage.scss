@@ -1,0 +1,157 @@
+.interview-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: 'Inter', sans-serif;
+
+  .interview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .badge {
+        background-color: #eef2ff;
+        color: #4338ca;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      .progress-text { color: #4b5563; }
+    }
+
+    .end-btn {
+      border: 1px solid #d1d5db;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      &:hover { background: #f9fafb; }
+    }
+  }
+
+  .chat-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .message {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-radius: 12px;
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+      }
+
+      .content {
+        flex: 1;
+        .sender-name {
+          font-weight: 600;
+          color: #111827;
+          margin-bottom: 0.5rem;
+        }
+        .text { color: #374151; line-height: 1.6; }
+      }
+
+      &.ai-question {
+        background-color: #f6f6f3;
+        .avatar { background-color: #d1fae5; color: #047857; }
+      }
+
+      &.user-answer {
+        background-color: #eef2ff;
+        .avatar { background-color: #c7d2fe; color: #4338ca; }
+      }
+
+      &.ai-feedback {
+        background-color: #f6f6f3;
+        .avatar { background-color: #d1fae5; color: #047857; }
+        
+        .feedback-box {
+          margin-top: 1rem;
+          padding: 1rem;
+          background-color: #ecfccb;
+          border: 1px solid #a7f3d0;
+          border-radius: 8px;
+          
+          .score {
+            display: inline-block;
+            background-color: #065f46;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+
+  .input-area {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: white;
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      border: none;
+      resize: none;
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+
+      .progress-bar {
+        height: 4px;
+        background-color: #e5e7eb;
+        border-radius: 2px;
+        width: 60%;
+        overflow: hidden;
+        .fill {
+          height: 100%;
+          background-color: #4338ca;
+        }
+      }
+
+      button {
+        background-color: white;
+        border: 1px solid #d1d5db;
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        &:hover { background-color: #f9fafb; }
+      }
+    }
+  }
+}

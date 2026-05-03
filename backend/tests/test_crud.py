@@ -78,3 +78,28 @@ def test_create_interview_session_and_qna(db_session):
     sessions_by_user = crud.get_interview_sessions_by_user(db_session, user_id=user.id)
     assert len(sessions_by_user) == 1
     assert sessions_by_user[0].id == session_obj.id
+
+
+def test_duplicate_topic_name(db_session):
+    crud.create_topic(db_session, schemas.TopicCreate(topic_name="Unique Topic"))
+    try:
+        crud.create_topic(db_session, schemas.TopicCreate(topic_name="Unique Topic"))
+        assert False, "Should raise exception for duplicate"
+    except Exception:
+        pass
+
+
+def test_get_nonexistent_topic(db_session):
+    result = crud.get_topic(db_session, 999)
+    assert result is None
+
+
+def test_update_nonexistent_tag(db_session):
+    result = crud.update_tag(db_session, 999, schemas.TagCreate(tag_name="new"))
+    assert result is None
+
+
+def test_delete_nonexistent_knowledge_source(db_session):
+    result = crud.delete_knowledge_source(db_session, 999)
+    assert result is None
+

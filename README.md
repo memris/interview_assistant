@@ -83,6 +83,18 @@ The backend will be available at `http://localhost:8000`.
 
 ---
 
+### Running Tests
+
+To run the backend unit tests:
+
+```bash
+# From the project root
+source venv/bin/activate
+python -m pytest backend/tests
+```
+
+---
+
 ### Frontend Setup
 
 ```bash

@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from pydantic import Field 
+from pydantic import Field, ConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -9,15 +9,15 @@ class Settings(BaseSettings):
     """
     
     # --- Настройки проекта ---
-    PROJECT_NAME: str = Field(..., env='PROJECT_NAME')
-    PROJECT_VERSION: str = Field(..., env='PROJECT_VERSION')
+    PROJECT_NAME: str = Field(...)
+    PROJECT_VERSION: str = Field(...)
     
     # --- Настройки базы данных PostgreSQL ---
-    POSTGRES_USER: str = Field(..., env='POSTGRES_USER')
-    POSTGRES_PASSWORD: str = Field(..., env='POSTGRES_PASSWORD')
-    POSTGRES_SERVER: str = Field(..., env='POSTGRES_SERVER')
-    POSTGRES_PORT: int = Field(..., env='POSTGRES_PORT')
-    POSTGRES_DB: str = Field(..., env='POSTGRES_DB')
+    POSTGRES_USER: str = Field(...)
+    POSTGRES_PASSWORD: str = Field(...)
+    POSTGRES_SERVER: str = Field(...)
+    POSTGRES_PORT: int = Field(...)
+    POSTGRES_DB: str = Field(...)
 
     # llm
     GIGACHAT_CREDENTIALS: Optional[str] = None 
@@ -38,8 +38,9 @@ class Settings(BaseSettings):
             f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8"
+    )
 
 settings = Settings()
