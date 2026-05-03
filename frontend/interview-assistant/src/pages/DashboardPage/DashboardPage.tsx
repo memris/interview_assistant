@@ -24,12 +24,10 @@ const DashboardPage: React.FC = () => {
   const handleStartSession = async () => {
     if (!selectedTopic) return;
     try {
-      // Создаем новую сессию
       const response = await axios.post('http://127.0.0.1:8000/api/interview-sessions/', {
         topic_id: selectedTopic,
         user_id: 1 // TODO: Заменить на ID текущего пользователя из токена
       });
-      // Переходим на страницу чата
       navigate(`/interview/${response.data.id}`);
     } catch (error) {
       console.error("Не удалось создать сессию: ", error);
@@ -68,7 +66,7 @@ const DashboardPage: React.FC = () => {
         Начать сессию
       </button>
 
-      {/* Блок статистики (пока статичный для красоты, потом подключим к БД) */}
+      {/* Блок статистики (пока статичный) */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-value">14</div>

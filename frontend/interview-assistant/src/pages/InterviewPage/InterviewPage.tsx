@@ -10,8 +10,6 @@ const InterviewPage: React.FC = () => {
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Для верстки пока используем захардкоженные данные (как на макете)
-  // Позже сюда будут попадать реальные данные из БД
   const [chatHistory, setChatHistory] = useState([
     {
       id: 1,
@@ -56,7 +54,7 @@ const InterviewPage: React.FC = () => {
       setCurrentQuestion({ id: 3, text: "Что такое Dependency Injection и как оно работает в FastAPI?" });
     }, 1500);
 
-    /* --- РЕАЛЬНАЯ ЛОГИКА (раскомментируй позже) ---
+    /* РЕАЛЬНАЯ ЛОГИКА
     try {
       setIsLoading(true);
       
