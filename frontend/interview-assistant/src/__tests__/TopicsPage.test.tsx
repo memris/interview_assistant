@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import axios from 'axios';
-import TopicsPage from '../pages/TopicsPage';
+import TopicsPage from '../pages/TopicsPage/TopicsPage';
 
 vi.mock('axios');
 

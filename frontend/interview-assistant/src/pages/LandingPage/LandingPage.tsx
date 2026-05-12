@@ -74,7 +74,7 @@ const LandingPage: React.FC = () => {
               <li>Browser API</li>
               <li>State Management</li>
             </ul>
-            <button className="topic-btn" onClick={() => navigate('/interview/frontend')}>
+            <button className="topic-btn" onClick={() => navigate('/topics')}>
               Выбрать
             </button>
           </div>
@@ -91,7 +91,7 @@ const LandingPage: React.FC = () => {
               <li>System Design</li>
               <li>Docker</li>
             </ul>
-            <button className="topic-btn" onClick={() => navigate('/interview/backend')}>
+            <button className="topic-btn" onClick={() => navigate('/topics')}>
               Выбрать
             </button>
           </div>

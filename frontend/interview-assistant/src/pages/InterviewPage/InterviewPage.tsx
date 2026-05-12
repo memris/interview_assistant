@@ -3,6 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './InterviewPage.scss';
 
+// описание типа данных для истории чата
+interface ChatItem {
+  id: number;
+  question: string;
+  userAnswer: string;
+  score: number;
+  feedback: string;
+}
+
 const InterviewPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
@@ -10,78 +19,90 @@ const InterviewPage: React.FC = () => {
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const [chatHistory, setChatHistory] = useState([
-    {
-      id: 1,
-      question: "Объясните разницу между asyncio.gather() и asyncio.wait() в Python 3.12. В каких случаях предпочтительнее использовать каждый из них?",
-      userAnswer: "asyncio.gather() запускает корутины параллельно и возвращает список результатов в том же порядке. asyncio.wait() даёт больше контроля — можно обрабатывать задачи по мере завершения через done и pending множества.",
-      score: 8,
-      feedback: "Верно описана основная разница. Стоит добавить: gather() отменяет все задачи при исключении в одной (если return_exceptions=False), тогда как wait() позволяет продолжить выполнение остальных. Также не упомянут параметр timeout в asyncio.wait()."
-    }
-  ]);
+  const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<{id: number, text: string} | null>(null);
 
-  // Текущий вопрос, на который пользователь должен ответить сейчас
-  const [currentQuestion, setCurrentQuestion] = useState({
-    id: 2,
-    text: "Расскажите, как реализована синхронизация потоков при доступе к общим данным в FastAPI?"
-  });
+  // Получение первого вопроса при загрузке страницы
+  useEffect(() => {
+    const startInterview = async () => {
+      try {
+        setIsLoading(true);
+        const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+        
+        const res = await axios.post(
+          `http://127.0.0.1:8000/api/interview-sessions/${sessionId}/generate-question`,
+          {},
+          config
+        );
+        
+        // установка полученного вопроса от бэкенда
+        setCurrentQuestion({ id: res.data.id, text: res.data.question_text });
+      } catch (error) {
+        console.error("Ошибка при получении первого вопроса:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    startInterview();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]); // выполнится один раз при открытии сессии
+
 
   const handleEndSession = () => {
     if (confirm("Вы уверены, что хотите завершить сессию?")) {
-      navigate('/topics'); // Возвращаем на дашборд
+      navigate('/topics');
     }
   };
 
+  // реальная отправка ответа
   const handleSubmitAnswer = async () => {
-    if (!answer.trim()) return;
+    if (!answer.trim() || !currentQuestion) return;
 
-    // ВРЕМЕННАЯ ЛОГИКА ДЛЯ ВЕРСТКИ (имитация загрузки)
-    setIsLoading(true);
-    setTimeout(() => {
-      setChatHistory([
-        ...chatHistory, 
-        {
-          id: currentQuestion.id,
-          question: currentQuestion.text,
-          userAnswer: answer,
-          score: 7,
-          feedback: "Хороший ответ, но можно было бы упомянуть использование мьютексов."
-        }
-      ]);
-      setAnswer('');
-      setIsLoading(false);
-      // Имитация получения следующего вопроса
-      setCurrentQuestion({ id: 3, text: "Что такое Dependency Injection и как оно работает в FastAPI?" });
-    }, 1500);
-
-    /* РЕАЛЬНАЯ ЛОГИКА
     try {
       setIsLoading(true);
+      const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
       
-      // 1. Отправляем ответ пользователя на оценку
-      const evalResponse = await axios.post(`http://127.0.0.1:8000/api/interview-sessions/${sessionId}/submit-answer`, {
-        qna_id: currentQuestion.id,
-        user_answer: answer
-      });
+      // А) Отправляем ответ пользователя на оценку
+      // ВАЖНО: Если бэкенд ждет параметры через URL (query), то нужно передавать через params. 
+      // Если через тело запроса (JSON), то как здесь:
+      const evalResponse = await axios.post(
+        `http://127.0.0.1:8000/api/interview-sessions/${sessionId}/submit-answer?qna_id=${currentQuestion.id}&user_answer=${encodeURIComponent(answer)}`, 
+        {},
+        config
+      );
 
-      // Добавляем в историю оцененный ответ
-      setChatHistory([...chatHistory, evalResponse.data]);
-      setAnswer('');
+      // Б) Добавляем текущий диалог в историю, преобразуя данные из бэкенда в наш формат
+      const newHistoryItem: ChatItem = {
+        id: currentQuestion.id,
+        question: currentQuestion.text,
+        userAnswer: answer,
+        score: evalResponse.data.score || 0, // берем оценку от ИИ
+        feedback: evalResponse.data.feedback || "Нет фидбэка" // берем фидбэк от ИИ
+      };
+      
+      setChatHistory(prev => [...prev, newHistoryItem]);
+      setAnswer(''); // Очищаем поле ввода
 
-      // 2. Сразу запрашиваем следующий вопрос
-      const nextQuestionRes = await axios.post(`http://127.0.0.1:8000/api/interview-sessions/${sessionId}/generate-question`);
+      // В) Запрашиваем следующий вопрос
+      const nextQuestionRes = await axios.post(
+        `http://127.0.0.1:8000/api/interview-sessions/${sessionId}/generate-question`,
+        {}, 
+        config 
+      );
+
+      // Обновляем текущий вопрос
       setCurrentQuestion({
         id: nextQuestionRes.data.id,
         text: nextQuestionRes.data.question_text
       });
 
     } catch (error) {
-      console.error("Ошибка сети:", error);
-      alert("Не удалось отправить ответ.");
+      console.error("Ошибка сети при отправке ответа:", error);
+      alert("Не удалось отправить ответ и получить оценку.");
     } finally {
       setIsLoading(false);
     }
-    --------------------------------------------- */
   };
 
   return (
@@ -89,7 +110,7 @@ const InterviewPage: React.FC = () => {
       {/* Шапка */}
       <div className="interview-header">
         <div className="left">
-          <span className="badge">Python</span>
+          <span className="badge">Интервью</span>
           <span className="progress-text">Вопрос {chatHistory.length + 1} из 10</span>
         </div>
         <button className="end-btn" onClick={handleEndSession}>
@@ -101,7 +122,6 @@ const InterviewPage: React.FC = () => {
       <div className="chat-history">
         {chatHistory.map((item, index) => (
           <React.Fragment key={index}>
-            {/* Вопрос ИИ */}
             <div className="message ai-question">
               <div className="avatar">AI</div>
               <div className="content">
@@ -110,7 +130,6 @@ const InterviewPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Ответ пользователя */}
             <div className="message user-answer">
               <div className="avatar">AM</div>
               <div className="content">
@@ -119,7 +138,6 @@ const InterviewPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Оценка ИИ */}
             <div className="message ai-feedback">
               <div className="avatar">AI</div>
               <div className="content">
@@ -127,7 +145,7 @@ const InterviewPage: React.FC = () => {
                 <div className="feedback-box">
                   <div>
                     <span className="score">{item.score} / 10</span>
-                    <span style={{ fontWeight: 600, color: '#065f46' }}>
+                    <span style={{ fontWeight: 600, color: item.score >= 5 ? '#065f46' : '#991b1b' }}>
                       {item.score >= 8 ? 'Отличный ответ' : item.score >= 5 ? 'Хороший ответ' : 'Нужно повторить'}
                     </span>
                   </div>
@@ -140,7 +158,7 @@ const InterviewPage: React.FC = () => {
           </React.Fragment>
         ))}
 
-        {/* Текущий (новый) вопрос от ИИ, на который нужно ответить */}
+        {/* Текущий (новый) вопрос от ИИ */}
         {currentQuestion && (
           <div className="message ai-question">
             <div className="avatar">AI</div>
@@ -148,6 +166,14 @@ const InterviewPage: React.FC = () => {
               <div className="sender-name">Ассистент</div>
               <div className="text">{currentQuestion.text}</div>
             </div>
+          </div>
+        )}
+        
+        {/* Индикатор загрузки пока ИИ думает */}
+        {isLoading && currentQuestion && chatHistory.length > 0 && (
+          <div className="message ai-feedback" style={{ opacity: 0.7 }}>
+             <div className="avatar">AI</div>
+             <div className="content">Ассистент анализирует ваш ответ...</div>
           </div>
         )}
       </div>
@@ -158,18 +184,17 @@ const InterviewPage: React.FC = () => {
           placeholder="Введите ваш ответ..."
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          disabled={isLoading}
+          disabled={isLoading || !currentQuestion}
         ></textarea>
         
         <div className="input-footer">
           <div className="progress-bar">
-            {/* Заполнение прогресс-бара */}
             <div className="fill" style={{ width: `${(chatHistory.length + 1) * 10}%` }}></div>
           </div>
           <span style={{ fontSize: '0.875rem', color: '#6b7280', marginRight: 'auto', marginLeft: '1rem' }}>
             {chatHistory.length + 1} / 10 вопросов
           </span>
-          <button onClick={handleSubmitAnswer} disabled={isLoading || !answer.trim()}>
+          <button onClick={handleSubmitAnswer} disabled={isLoading || !answer.trim() || !currentQuestion}>
             {isLoading ? 'Отправка...' : 'Ответить'}
           </button>
         </div>

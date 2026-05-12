@@ -1,0 +1,106 @@
+@use "sass:color";
+
+$primary-color: #4338CA;
+$text-dark: #1e293b;
+$text-gray: #64748b;
+$border-color: #e2e8f0;
+
+.topics-page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+  background-color: #ffffff;
+  font-family: 'Inter', sans-serif;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3.5rem;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+  }
+
+  .cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .topic-card {
+    border: 2px solid $primary-color;
+    border-radius: 1.5rem;
+    padding: 3rem 1.5rem 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(67, 56, 202, 0.1);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 2.5rem;
+    }
+
+    .skills-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 3rem 0;
+      width: 100%;
+      flex-grow: 1;
+
+      li {
+        padding: 0.8rem 0;
+        color: $text-gray;
+        text-align: center;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.95rem;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    .select-btn {
+      width: 100%;
+      max-width: 280px;
+      padding: 0.9rem;
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background-color: color.adjust($primary-color, $lightness: -5%);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+  }
+}
+
+.topics-page-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: $text-gray;
+}
