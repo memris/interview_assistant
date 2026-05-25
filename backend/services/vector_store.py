@@ -1,6 +1,8 @@
 import os
-from langchain_chroma import Chroma
+from langchain_qdrant import QdrantVectorStore
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance, VectorParams
 from backend.config import settings
 
 class VectorStoreService:
@@ -10,10 +12,29 @@ class VectorStoreService:
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
         
-        self.vector_db = Chroma(
-            persist_directory=settings.VECTOR_DB_DIR,
-            embedding_function=self.embeddings,
-            collection_name="knowledge_base"
+        # Инициализация клиента Qdrant с локальным хранилищем
+        self.client = QdrantClient(path=settings.VECTOR_DB_PATH)
+        
+        # Параметры коллекции
+        collection_name = "knowledge_base"
+        embedding_dimension = 384  # размерность all-MiniLM-L6-v2
+        
+        # Проверка, существует ли коллекция, если нет - создаем
+        try:
+            self.client.get_collection(collection_name)
+        except Exception:
+            self.client.create_collection(
+                collection_name=collection_name,
+                vectors_config=VectorParams(
+                    size=embedding_dimension,
+                    distance=Distance.COSINE
+                )
+            )
+        
+        self.vector_db = QdrantVectorStore.from_existing_collection(
+            embedding=self.embeddings,
+            collection_name=collection_name,
+            client=self.client
         )
 
     def add_documents(self, documents, source_id: int):

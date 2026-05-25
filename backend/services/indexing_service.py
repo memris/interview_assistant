@@ -16,7 +16,7 @@ class IndexingService:
 
     async def process_source(self, db: Session, source_id: int, file_path: str):
         """
-        Процесс: Загрузка файла -> Извлечение текста -> Сохранение в БД -> Индексация в ChromaDB
+        Процесс: Загрузка файла -> Извлечение текста -> Сохранение в БД -> Индексация в Qdrant
         """
         # получение объекта из БД
         source = db.query(KnowledgeSource).filter(KnowledgeSource.id == source_id).first()
@@ -49,7 +49,7 @@ class IndexingService:
                 chunk.metadata["topic_id"] = source.topic_id
                 chunk.metadata["source_id"] = source.id
 
-            # отпр в ChromaDB (эмбеддинги через GigaChat)
+            # отпр в Qdrant (эмбеддинги через HuggingFace)
             vector_store_service.add_documents(chunks, source_id=source.id)
 
             source.status = SourceStatus.COMPLETED
