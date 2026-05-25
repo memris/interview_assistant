@@ -2,7 +2,7 @@ import asyncio
 from backend.services.rag_service import rag_service
 from unittest.mock import patch
 
-
+# Валидация логики генерации и структуры ответа ИИ
 def test_generate_question():
     with patch('backend.services.rag_service.vector_store_service.search', return_value=[]):
         result = asyncio.run(rag_service.generate_question(1))
