@@ -1,3 +1,14 @@
+#
+# Qdrant Setup for Local Development
+#
+# To run a local Qdrant server (vector database), use Docker:
+#
+#     docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+#
+# This will start Qdrant on http://localhost:6333
+#
+# Make sure your backend is configured to use this URL for vector storage.
+
 # Interview Assistant
 
 > An AI-powered full-stack application for conducting technical interviews, evaluating candidate answers, and helping candidates prepare — powered by **GigaChat API** and a **local embeddings model** (sentence-transformers/all-MiniLM-L6-v2 from HuggingFace).

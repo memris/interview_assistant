@@ -29,12 +29,12 @@ app.include_router(tags.router, prefix="/api")
 app.include_router(knowledge_sources.router, prefix="/api")
 app.include_router(interview_sessions.router, prefix="/api")
 
-
 current_file_path = os.path.dirname(os.path.realpath(__file__))
-
 frontend_path = os.path.join(current_file_path, "..", "frontend")
 
-app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
+# Вариант A: Монтировать статику на другой путь (например /static)
+if os.path.exists(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path, html=True), name="static")
 
 @app.get("/", tags=["Root"])
 def read_root():

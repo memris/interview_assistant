@@ -12,29 +12,29 @@ class VectorStoreService:
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
         
-        # Инициализация клиента Qdrant с локальным хранилищем
-        self.client = QdrantClient(path=settings.VECTOR_DB_PATH)
-        
         # Параметры коллекции
         collection_name = "knowledge_base"
         embedding_dimension = 384  # размерность all-MiniLM-L6-v2
-        
+
+        # Инициализация клиента Qdrant с локальным сервером
+        client = QdrantClient(url=settings.QDRANT_URL)
+
         # Проверка, существует ли коллекция, если нет - создаем
         try:
-            self.client.get_collection(collection_name)
+            client.get_collection(collection_name)
         except Exception:
-            self.client.create_collection(
+            client.create_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(
                     size=embedding_dimension,
                     distance=Distance.COSINE
                 )
             )
-        
+
         self.vector_db = QdrantVectorStore.from_existing_collection(
             embedding=self.embeddings,
             collection_name=collection_name,
-            client=self.client
+            url=settings.QDRANT_URL
         )
 
     def add_documents(self, documents, source_id: int):

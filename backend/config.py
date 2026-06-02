@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     GIGACHAT_CREDENTIALS: Optional[str] = None 
 
     # rag
-    VECTOR_DB_PATH: str = "vector_db_data/qdrant" # папка, где Qdrant будет хранить свои данные
+    QDRANT_URL: str = "http://localhost:6333"  # URL for local Qdrant server
     CHUNK_SIZE: int = 1000                # размер кусочка текста (в символах)
     CHUNK_OVERLAP: int = 100              # нахлест между кусочками (чтобы не терять контекст)
 
